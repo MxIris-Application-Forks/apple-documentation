@@ -1,0 +1,24 @@
+name: Setup Build Environment
+description: Setup Xcode
+runs:
+  using: "composite"
+  steps:
+    - uses: actions/cache@v4
+      with:
+        path: DerivedData
+        key: ${{ runner.os }}-deriveddata
+    - name: Git settings
+      shell: bash
+      run: |
+        # https://qiita.com/thaim/items/3d1a4d09ec4a7d8844ce
+        git config --local user.name "github-actions[bot]"
+        git config --local user.email "41898282+github-actions[bot]@users.noreply.github.com"
+    - name: Select Xcode
+      shell: bash
+      run: |
+        sudo xcode-select --switch "/Applications/Xcode_15.2.app"
+    - name: Prepare project
+      shell: bash
+      run: |
+        mkdir -p Configurations/debug
+        cp .github/workflows/GoogleService-Info.plist Configurations/debug/GoogleService-Info.plist

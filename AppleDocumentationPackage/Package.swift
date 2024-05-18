@@ -57,7 +57,7 @@ extension Target {
 let package = Package(
     name: "AppleDocumentationPackage",
     defaultLocalization: "en",
-    platforms: [.iOS(.v17), .macOS(.v13)],
+    platforms: [.iOS(.v17), .macOS(.v14)],
     products: [
         .library(
             name: "AppleDocumentationApp",
@@ -70,13 +70,14 @@ let package = Package(
         )
     ],
     dependencies: [
-        .package(url: "https://github.com/kean/Nuke.git", from: "12.4.0"),
+        .package(url: "https://github.com/kean/Nuke.git", from: "12.6.0"),
         .package(url: "https://github.com/apple/swift-algorithms.git", from: "1.2.0"),
+        .package(url: "https://github.com/firebase/firebase-ios-sdk", from: "10.23.1"),
 
-        .package(url: "https://github.com/apple/swift-syntax.git", from: "509.1.1"),
+        .package(url: "https://github.com/apple/swift-syntax.git", from: "510.0.2"),
 
-        .package(url: "https://github.com/swiftty/XcodeGenBinary.git", from: "2.38.0"),
-        .package(url: "https://github.com/swiftty/SwiftLintBinary.git", from: "0.54.0")
+        .package(url: "https://github.com/swiftty/XcodeGenBinary.git", from: "2.40.1"),
+        .package(url: "https://github.com/swiftty/SwiftLintBinary.git", from: "0.55.1")
     ],
     targets: [
         .target(
@@ -128,7 +129,9 @@ let package = Package(
                 "RootPage",
                 "SafariPage",
                 "AllTechnologiesPage",
-                "TechnologyDetailPage"
+                "TechnologyDetailPage",
+
+                .product(name: "FirebaseCrashlytics", package: "firebase-ios-sdk"),
             ]
         ),
 
@@ -218,6 +221,9 @@ let package = Package(
             name: "DevelopmentAssets",
             dependencies: [
                 "AppleDocumentationAPI"
+            ],
+            resources: [
+                .process("Resources")
             ]
         )
     ]
@@ -227,7 +233,7 @@ package.targets.forEach {
     var plugins = $0.plugins ?? []
 
     plugins += [
-        .plugin(name: "SwiftLintPlugin", package: "SwiftLintBinary")
+        .plugin(name: "SwiftLintBuildToolPlugin", package: "SwiftLintBinary")
     ]
     $0.plugins = plugins
 }
