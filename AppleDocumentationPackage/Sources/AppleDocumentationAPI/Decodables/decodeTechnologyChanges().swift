@@ -13,8 +13,12 @@ private struct RawContent: Decodable {
         case change
     }
 
-    init(from decoder: Decoder) throws {
+    init(from decoder: any Decoder) throws {
         let c = try decoder.container(keyedBy: CodingKeys.self)
-        change = try c.decodeIfPresent(Technology.Changes.Change.self, forKey: .change)
+        do {
+            change = try c.decodeIfPresent(Technology.Changes.Change.self, forKey: .change)
+        } catch DecodingError.dataCorrupted {
+            change = nil
+        }
     }
 }

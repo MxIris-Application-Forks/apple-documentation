@@ -1,8 +1,8 @@
-// swift-tools-version: 5.9
+// swift-tools-version: 6.0
 // The swift-tools-version declares the minimum version of Swift required to build this package.
 
-import PackageDescription
 import CompilerPluginSupport
+import PackageDescription
 
 enum Feature {
     case app
@@ -70,14 +70,14 @@ let package = Package(
         )
     ],
     dependencies: [
-        .package(url: "https://github.com/kean/Nuke.git", from: "12.6.0"),
-        .package(url: "https://github.com/apple/swift-algorithms.git", from: "1.2.0"),
-        .package(url: "https://github.com/firebase/firebase-ios-sdk", from: "10.23.1"),
+        .package(url: "https://github.com/kean/Nuke.git", from: "12.8.0"),
+        .package(url: "https://github.com/apple/swift-algorithms.git", from: "1.2.1"),
+        .package(url: "https://github.com/firebase/firebase-ios-sdk.git", from: "11.13.0"),
 
-        .package(url: "https://github.com/apple/swift-syntax.git", from: "510.0.2"),
+        .package(url: "https://github.com/apple/swift-syntax.git", from: "601.0.1"),
 
-        .package(url: "https://github.com/swiftty/XcodeGenBinary.git", from: "2.40.1"),
-        .package(url: "https://github.com/swiftty/SwiftLintBinary.git", from: "0.55.1")
+        .package(url: "https://github.com/swiftty/XcodeGenBinary.git", from: "2.43.0"),
+        .package(url: "https://github.com/swiftty/SwiftLintBinary.git", exact: "0.59.1-patch")
     ],
     targets: [
         .target(
@@ -115,7 +115,7 @@ let package = Package(
             name: "SupportMacrosPluginTests",
             dependencies: [
                 "SupportMacrosPlugin",
-                .product(name: "SwiftSyntaxMacrosTestSupport", package: "swift-syntax")
+                .product(name: "SwiftSyntaxMacrosGenericTestSupport", package: "swift-syntax")
             ]
         ),
 
@@ -131,7 +131,7 @@ let package = Package(
                 "AllTechnologiesPage",
                 "TechnologyDetailPage",
 
-                .product(name: "FirebaseCrashlytics", package: "firebase-ios-sdk"),
+                .product(name: "FirebaseCrashlytics", package: "firebase-ios-sdk")
             ]
         ),
 
@@ -229,13 +229,22 @@ let package = Package(
     ]
 )
 
-package.targets.forEach {
-    var plugins = $0.plugins ?? []
+extension Optional {
+    static func += <T>(lhs: inout Self, rhs: [T]) where Wrapped == [T] {
+        lhs = (lhs ?? []) + rhs
+    }
+}
 
-    plugins += [
+package.targets.forEach { target in
+    if target.type != .macro {
+        target.swiftSettings += [
+            .enableUpcomingFeature("ExistentialAny"),
+            .enableUpcomingFeature("InternalImportsByDefault")
+        ]
+    }
+    target.plugins += [
         .plugin(name: "SwiftLintBuildToolPlugin", package: "SwiftLintBinary")
     ]
-    $0.plugins = plugins
 }
 
 let isDEBUG = true

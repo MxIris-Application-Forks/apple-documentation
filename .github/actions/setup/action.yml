@@ -6,7 +6,10 @@ runs:
     - uses: actions/cache@v4
       with:
         path: DerivedData
-        key: ${{ runner.os }}-deriveddata
+        key: ${{ runner.os }}-deriveddata-${{ hashFiles('**/Package.resolved') }}
+        restore-keys: |
+          ${{ runner.os }}-deriveddata-${{ hashFiles('**/Package.resolved') }}
+          ${{ runner.os }}-deriveddata
     - name: Git settings
       shell: bash
       run: |
@@ -16,7 +19,7 @@ runs:
     - name: Select Xcode
       shell: bash
       run: |
-        sudo xcode-select --switch "/Applications/Xcode_15.2.app"
+        sudo xcode-select --switch "/Applications/Xcode_16.2.app"
     - name: Prepare project
       shell: bash
       run: |
